@@ -35,6 +35,9 @@ class AddLoc(BaseWidget):
         if self.parent!=None: self.parent.addentry(self)
         self.close()
 
+
+class ErrorMsg(BaseWidget):
+
 class Gupload(BaseWidget):
 
     def __init__(self):
@@ -46,7 +49,7 @@ class Gupload(BaseWidget):
         self._button        = ControlButton('Upload Files')
         self._progress      = ControlText('Progress')
         #self.panel          = ControlEmptyWidget()
-        self._list          = []
+        self._dict          = {}
 
 
         self.picklefilename = Path(config_dir, 'foldloc.dat')
@@ -57,6 +60,7 @@ class Gupload(BaseWidget):
             self.load()
         else:
             f = open(self.picklefilename, 'wb')
+            pickle.dump({}, f)
             f.close()
             self.load()
 
@@ -69,7 +73,7 @@ class Gupload(BaseWidget):
         f = open(self.picklefilename, 'rb')
         self._dict = pickle.load(f)
         for name in self._dict.keys():
-            self._dropdown.add_item(entry['name'], entry['locations'])
+            self._dropdown.add_item(name, self._dict[name])
 
     def dump(self):
         f = open(self.picklefilename, 'wb')
@@ -89,13 +93,13 @@ class Gupload(BaseWidget):
 
 
     def addentry(self, obj):
-        entry = {'name': obj._name.value, 'locations': \
-        (obj._local.value, obj._remote.value)}
+        name = obj._name.value
+        tup = (obj._local.value, obj._remote.value)
 
-        if obj._name.value not in self._dict.keys():
-            self._dict.append(entry)
+        if name not in self._dict.keys():
+            self._dict[name] = tup
             self.dump()
-            self._dropdown.add_item(entry['name'], entry['locations'])
+            self._dropdown.add_item(name, tup)
 
     def __plusbuttonAction(self):
         win = AddLoc(self)
