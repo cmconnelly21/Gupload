@@ -57,7 +57,6 @@ class Gupload(BaseWidget):
             self.load()
         else:
             f = open(self.picklefilename, 'wb')
-            pickle.dump([], f)
             f.close()
             self.load()
 
@@ -68,14 +67,13 @@ class Gupload(BaseWidget):
         #function to populate dropdown
     def load(self):
         f = open(self.picklefilename, 'rb')
-        data = pickle.load(f)
-        for entry in data:
-            self._list.append(entry)
+        self._dict = pickle.load(f)
+        for name in self._dict.keys():
             self._dropdown.add_item(entry['name'], entry['locations'])
 
     def dump(self):
         f = open(self.picklefilename, 'wb')
-        pickle.dump(self._list, f)
+        pickle.dump(self._dict, f)
         f.close()
 
     def setStatus(self, status):
@@ -94,8 +92,8 @@ class Gupload(BaseWidget):
         entry = {'name': obj._name.value, 'locations': \
         (obj._local.value, obj._remote.value)}
 
-        if obj._name.value not in self._list:
-            self._list.append(entry)
+        if obj._name.value not in self._dict.keys():
+            self._dict.append(entry)
             self.dump()
             self._dropdown.add_item(entry['name'], entry['locations'])
 
