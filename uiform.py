@@ -35,8 +35,19 @@ class AddLoc(BaseWidget):
         if self.parent!=None: self.parent.addentry(self)
         self.close()
 
-
 class ErrorMsg(BaseWidget):
+    def __init__(self, parent):
+        super(ErrorMsg,self).__init__('ErrorMsg')
+
+        self._error = ControlText('Error Message')
+        self._closebutton = ControlButton('Ok')
+
+        self.parent = parent
+        self._closebutton.value = self._closebuttonAction
+
+    def _closebuttonAction(self):
+        if self.parent!=None: self.parent.__errorbuttonAction(self)
+        self.close()
 
 class Gupload(BaseWidget):
 
@@ -91,6 +102,11 @@ class Gupload(BaseWidget):
         folder_upload.file_upload(self._dropdown.value[1], \
         self._dropdown.value[0], self.setStatus)
 
+    def __errorbuttonAction(self):
+        win = ErrorMsg(self)
+        win.parent = self
+        win.show()
+        self._error = 'You did something wrong'
 
     def addentry(self, obj):
         name = obj._name.value
@@ -100,11 +116,15 @@ class Gupload(BaseWidget):
             self._dict[name] = tup
             self.dump()
             self._dropdown.add_item(name, tup)
+        else:
+            __errorbuttonAction()
+
 
     def __plusbuttonAction(self):
         win = AddLoc(self)
         win.parent = self
         win.show()
+
 
 #Execute the application
 if __name__ == "__main__":   pyforms.start_app(Gupload)
